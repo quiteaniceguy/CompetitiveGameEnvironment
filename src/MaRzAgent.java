@@ -189,6 +189,8 @@ public class MaRzAgent extends Agent
 	 */
 	public MaRzAgent(char playerChar)
 	{
+		super(playerChar);
+		
 		hashFringe = new HashMap<String, MaRzAgent.SuffixNode>();
 
 		// Create an empty root node and split it to create an initial fringe
@@ -197,7 +199,7 @@ public class MaRzAgent extends Agent
 		hashFringe.put("", initNode);
 		this.activeNode = initNode;
 		
-		this.playerChar = playerChar;
+		
 
 	}// ctor
 

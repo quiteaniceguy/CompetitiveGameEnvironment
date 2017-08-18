@@ -125,9 +125,6 @@ public class NSMAgent extends Agent {
                                                     //value at each goal
     public static double MIN_RAND_CHANCE  =  0.0;
     
-    public char playerChar;
-    
-    
     protected NHood[] nhoods;
     protected double randChance = INIT_RAND_CHANCE;  //how frequently the agent
                                                      //make a random move
@@ -146,12 +143,13 @@ public class NSMAgent extends Agent {
 	 * The constructor for the agent simply initializes it's instance variables
 	 */
 	public NSMAgent(char playerChar) {
+		super(playerChar);
+		
         informationColumns = 2;
         
         nhoods = new NHood[alphabet.length];
         episodicMemory.clear();
-        
-        this.playerChar = playerChar;
+  
 	}//NSMAgent ctor
 
     /**
@@ -315,7 +313,6 @@ public class NSMAgent extends Agent {
     	
        
        
-    
         //while (episodicMemory.size() < MAX_EPISODES && Successes <= NUM_GOALS) { 
         
         //add an episode to represent the current moment
@@ -351,7 +348,7 @@ public class NSMAgent extends Agent {
         /////
         
         //boolean[] sensors = env.tick(cmd);
-        boolean[] sensors = RunCompetitiveEnvironment.env.tick('x', cmd);
+        boolean[] sensors = RunCompetitiveEnvironment.env.tick(playerChar, cmd);
         //Setup for next iteration
         
         
@@ -371,7 +368,8 @@ public class NSMAgent extends Agent {
             }
 
             //Inform the user of steps that were required
-            RunCompetitiveEnvironment.outputOne += String.valueOf(episodicMemory.size() - lastSuccess) + ",";
+             
+            RunCompetitiveEnvironment.outputValues.put(playerChar, RunCompetitiveEnvironment.outputValues.get(playerChar) + String.valueOf(episodicMemory.size() - lastSuccess) + ",");
             //System.out.print("n: " + String.valueOf(episodicMemory.size() - lastSuccess));
             //System.out.print(",");
             lastSuccess = episodicMemory.size();
