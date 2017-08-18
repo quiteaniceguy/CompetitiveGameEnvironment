@@ -423,10 +423,11 @@ public abstract class Agent {
         boolean[] sensors;
         // Enter each character in the path
         for (int i = 0; i < pathToTry.length(); i++) {
+        	
             sensors = RunCompetitiveEnvironment.env.tick(playerChar, pathToTry.charAt(i));
             
             //runs nsm agent tick each time MaRz agent ticks
-            //RunCompetitiveEnvironment.nsmExploreEnvironment();
+            //RunCompetitiveEnvironment.agentOneExploreEnvironment();
             
             int encodedSensorResult = encodeSensors(sensors);
             episodicMemory.add(new Episode(pathToTry.charAt(i), encodedSensorResult));

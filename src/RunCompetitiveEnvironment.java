@@ -15,8 +15,8 @@ public class RunCompetitiveEnvironment {
 	
 	public static CompetitiveGameEnvironment env;
 	
-	public static Agent nsm;
-	public static Agent marz;
+	public static Agent agentOne;
+	public static Agent agentTwo;
 	
 	public static String outputOne = "n: ";
 	public static String outputTwo = "m: ";
@@ -54,19 +54,18 @@ public class RunCompetitiveEnvironment {
 	}
 	
 	public static void exploreEnvironmentWithTwoAgents(){
-		nsm = new MaRzAgent('x');
-		marz = new MaRzAgent('o');
+		agentOne = new NSMAgent('x');
+		agentTwo = new NSMAgent('o');
 		
 		//nsm.setSensorOutputRandom(nsm.prevStateSensorOutput);
 		
-		while (nsm.episodicMemory.size() < nsm.MAX_EPISODES && nsm.Successes <= nsm.NUM_GOALS && marz.memory.length() < marz.MAX_EPISODES && marz.Successes <= marz.NUM_GOALS) { 
+		while (agentOne.episodicMemory.size() < agentOne.MAX_EPISODES && agentOne.Successes <= agentOne.NUM_GOALS && agentTwo.memory.length() < agentTwo.MAX_EPISODES && agentTwo.Successes <= agentTwo.NUM_GOALS) { 
 			
 			///MaRz exploreEnvironment also calls NSM exploreEnvironment
-			marz.exploreEnvironment();
-			nsm.exploreEnvironment();
+			agentTwo.exploreEnvironment();
+			agentOne.exploreEnvironment();
 			
 			
-			System.out.println(nsm.Successes);
 			
 			
 			//nsm.exploreEnvironment();
@@ -76,8 +75,8 @@ public class RunCompetitiveEnvironment {
 		
 	}
 	
-	public static void nsmExploreEnvironment(){
-	 nsm.exploreEnvironment();
+	public static void agentOneExploreEnvironment(){
+		agentOne.exploreEnvironment();
 	}
 	
 	public static void writeToFile(String fileName, String output){
