@@ -349,6 +349,7 @@ public class NSMAgent extends Agent {
         
         //boolean[] sensors = env.tick(cmd);
         boolean[] sensors = RunCompetitiveEnvironment.env.tick(playerChar, cmd);
+        System.out.println(playerChar + "move: " + cmd);
         //Setup for next iteration
         
         

@@ -30,6 +30,9 @@ public class CompetitiveGameEnvironment {
 	Map<Character, Integer> playerPos = new HashMap<Character, Integer>();
 	Map<Character, Integer> playerScore = new HashMap<Character, Integer>();
 	
+	/**
+	 * Initializes CompetitiveGameEnvironment for players 'x' and 'o'
+	 */
 	public CompetitiveGameEnvironment(){
 		transitions = new int[GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT][MOVES.length];
 		setTranstions(transitions);
@@ -50,6 +53,7 @@ public class CompetitiveGameEnvironment {
 		
 		
 		////testing
+		
 		//printTransitions(transitions);
 		/*
 		setGameboardSquare('x', 2);
@@ -58,39 +62,16 @@ public class CompetitiveGameEnvironment {
 		setGameboardSquare('x', 3);
 		*/
 		/*
-		printGameBoard(gameBoard);
-		//printGameBoard(checkForVictory(gameBoard, 'x'));
-		//setBoardPosToEmpty(gameBoard, checkForVictory(gameBoard, 'x'));
-		tick('x', 'a');
-		System.out.println(playerScore.get('x'));
-		printGameBoard(gameBoard);
-		
-		tick('x', 'c');
-		System.out.println(playerScore.get('x'));
-		printGameBoard(gameBoard);
-		
-		tick('x', 'c');
-		System.out.println(playerScore.get('x'));
-		printGameBoard(gameBoard);
-		
-		tick('x', 'a');
-		System.out.println(playerScore.get('x'));
-		printGameBoard(gameBoard);
-		
-		tick('x', 'b');
-		System.out.println(playerScore.get('x'));
-		printGameBoard(gameBoard);
-		
-		tick('o', 'b');
-		System.out.println(playerScore.get('o'));
-		printGameBoard(gameBoard);
-		
 		tick('x', 'b');
 		System.out.println(playerScore.get('o'));
 		printGameBoard(gameBoard);
 		*/
 	}
-	
+	/**
+	 * Sets state machine transitions according to the GAMEBOARD_WIDTH and GAMEBOARD_HEIGHT, allowing tesseract like moves wrapping around the game baord
+	 * @param transitions
+	 * 		int array to hold transition values
+	 */
 	private void setTranstions(int transitions[][]){
 		for (int i = 0; i < transitions.length; i++){
 			for(int j = 0; j < MOVES.length; j++)
@@ -100,6 +81,13 @@ public class CompetitiveGameEnvironment {
 		
 	}
 	
+	/**
+	 * Used to calculate the possible transitions for a position, including tesseract like moves.
+	 * @param xPos
+	 * @param transform
+	 * @param width
+	 * @return
+	 */
 	private int loopAround(int xPos, int transform, int width){
 		if (xPos + transform < 0)
 			return width + (transform % width);
@@ -109,7 +97,10 @@ public class CompetitiveGameEnvironment {
 	}
 	
 	
-	
+	/**
+	 * Prints each game state and its transitions to standard output
+	 * @param transitions
+	 */
 	private void printTransitions(int transitions[][]){
 		for (int i = 0; i < transitions.length; i++){
 			System.out.println(i + " transitions: ");
@@ -122,6 +113,10 @@ public class CompetitiveGameEnvironment {
 		}
 	}
 	
+	/**
+	 * Prints the current game board to standard output
+	 * @param gameBoard
+	 */
 	private void printGameBoard(char[][] gameBoard){
 		for(int i = 0; i < gameBoard.length; i++){
 			for(int j = 0; j < gameBoard[0].length; j++){
@@ -132,6 +127,16 @@ public class CompetitiveGameEnvironment {
 		System.out.println();
 	}
 	
+	
+	/**
+	 * Converts the state value into a game board position and sets it to char c
+	 * 
+	 * @param c
+	 * 		char to be set to
+	 * @param intPosition
+	 * 		state value
+	 * @return
+	 */
 	private boolean setGameboardSquare(char c, int intPosition){
 		if (gameBoard[(int)intPosition/GAMEBOARD_WIDTH][intPosition % GAMEBOARD_WIDTH] == c){
 			return false;
@@ -140,6 +145,14 @@ public class CompetitiveGameEnvironment {
 		return true;
 	}
 	
+	/**
+	 * Checks for vertical horizontal and diagonal victories for player cToCheck
+	 * and returns positions part of the winning set
+	 * 
+	 * @param board
+	 * @param cToCheck
+	 * @return
+	 */
 	private char[][] checkForVictory(char[][] board, char cToCheck){
 		char[][] returnValue = checkForDiagVictory(board, cToCheck);
 		if(!boardIsEmpty(returnValue)) return returnValue;
@@ -150,6 +163,12 @@ public class CompetitiveGameEnvironment {
 		return checkForHorzVictory(board, cToCheck);
 	}
 	
+	/**
+	 * Checks for a vertical victory for player cToCheck on board 'board'
+	 * @param board
+	 * @param cToCheck
+	 * @return
+	 */
 	private char[][] checkForVertVictory(char[][] board, char cToCheck){
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
 		for ( int i = 0; i < board[0].length; i++) {
@@ -171,6 +190,12 @@ public class CompetitiveGameEnvironment {
 		
 	}
 	
+	/**
+	 * Checks for a vertical victory on board 'board' for player cToCheck
+	 * @param board
+	 * @param cToCheck
+	 * @return
+	 */
 	private char[][] checkForHorzVictory(char[][] board, char cToCheck){
 		
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
@@ -190,6 +215,12 @@ public class CompetitiveGameEnvironment {
 		return returnValue;
 	}
 	
+	/**
+	 * Checks for a diagonal victory for player cToCheck on board 'board'
+	 * @param board
+	 * @param cToCheck
+	 * @return
+	 */
 	private char[][] checkForDiagVictory(char[][] board, char cToCheck){
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
 		for ( int i = 0; i < board.length && i < board[0].length; i++){
@@ -205,7 +236,11 @@ public class CompetitiveGameEnvironment {
 		return returnValue;
 	}
 	
-	
+	/**
+	 * Sets all positions in give array 'board' to 0
+	 * @param board
+	 * board to to be emptied
+	 */
 	private void setBoardToEmpty(char[][] board){
 		for (int i = 0; i < board.length; i++){
 			for (int j = 0; j < board[0].length; j++){
@@ -214,6 +249,12 @@ public class CompetitiveGameEnvironment {
 		}
 	}
 	
+	/**
+	 * Checks if board values are all 0
+	 * @param board
+	 * 		board to be checked
+	 * @return
+	 */
 	private boolean boardIsEmpty(char[][] board){
 		for (int i = 0; i < board.length; i++){
 			for (int j = 0; j < board[0].length; j++){
@@ -226,6 +267,13 @@ public class CompetitiveGameEnvironment {
 	}
 	
 	///board and spots to set must be the same width and height
+	/**
+	 * Sets all positions on board 'board to 0 according to those marked on board 'spotsToSet'
+	 * @param board
+	 * 		board to be altered
+	 * @param spotsToSet
+	 * 		non 0 values are positions on board 'board to be set to 0
+	 */
 	private void setBoardPosToEmpty(char[][] board, char[][] spotsToSet){
 		for ( int i = 0; i < board.length; i++){
 			for ( int j = 0; j < board[0].length; j++){
@@ -235,6 +283,12 @@ public class CompetitiveGameEnvironment {
 		}
 	}
 	
+	/**
+	 * Method which takes player given movement, make movement on board, and then supplies data back to player
+	 * @param playerChar
+	 * @param playerMove
+	 * @return
+	 */
 	public boolean[] tick(char playerChar, char playerMove) {
 		boolean[] returnSensors = new boolean[N_EXTRA_SENSORS + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT * CHAR_TO_BOOL_LENGTH + MOVES.length];
 		
@@ -300,6 +354,11 @@ public class CompetitiveGameEnvironment {
 		return returnSensors;
 	}
 	
+	/**
+	 * helper method that finds the index of letter 'letter' in array 'alphabet'
+	 * @param letter
+	 * @return
+	 */
 	private int findAlphabetIndex(char letter) {
 		for(int i = 0; i < alphabet.length; i++){
 			if(alphabet[i] == letter)
@@ -309,6 +368,10 @@ public class CompetitiveGameEnvironment {
 		
 	}
 	
+	/**
+	 * Prints boolean array as list of 1s and 0s, where 1 is true and 0 is false
+	 * @param boolArray
+	 */
 	private void printSensors(boolean[] boolArray){
 		System.out.println();
 		for ( int i = 0; i < boolArray.length; i++) {
@@ -326,6 +389,10 @@ public class CompetitiveGameEnvironment {
 		System.out.println();
 	}
 	
+	/**
+	 * helper method that returne alphabet
+	 * @return
+	 */
 	public char[] getAlphabet(){
 		return alphabet;
 	}
