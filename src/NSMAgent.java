@@ -349,7 +349,9 @@ public class NSMAgent extends Agent {
         
         //boolean[] sensors = env.tick(cmd);
         boolean[] sensors = RunCompetitiveEnvironment.env.tick(playerChar, cmd);
-        System.out.println(playerChar + "move: " + cmd);
+        
+        System.out.println("player " + playerChar + ": " + cmd);
+       
         //Setup for next iteration
         
         
@@ -379,7 +381,7 @@ public class NSMAgent extends Agent {
         {
             nowEp.reward = REWARD_FAILURE;
         }
-        
+        RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
         //while
     }//exploreEnvironment
     
@@ -397,7 +399,7 @@ public class NSMAgent extends Agent {
             
             int prevGoalPoint = 0; //which episode I last reached the goal at
             for(int i = 0; i < episodicMemory.size(); ++i) {
-                Episode ep = episodicMemory.get(i);
+                Episode ep = (Episode) episodicMemory.get(i);
                 if (ep.sensorValue == GOAL) {
                     csv.append(i - prevGoalPoint + ",");
                     csv.flush();

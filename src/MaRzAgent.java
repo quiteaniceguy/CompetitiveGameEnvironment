@@ -335,7 +335,7 @@ public class MaRzAgent extends Agent
         while (! hashFringe.containsKey(key))
         {
         	
-            Episode ep = episodicMemory.get(index);
+            Episode ep = (Episode) episodicMemory.get(index);
 
             //if we back into the previous goal without finding a key then there is no match
             if ((key.length() > 0) && (ep.sensorValue == GOAL)) return null;
@@ -385,7 +385,7 @@ public class MaRzAgent extends Agent
 			}// if
 
             //If we've backed into the previous goal then we can't match either
-			if ((parent.suffix.length() > 0) && (episodicMemory.get(index).sensorValue == GOAL))
+			if ((parent.suffix.length() > 0) && (((Episode)episodicMemory.get(index)).sensorValue == GOAL))
 			{
                 continue;
             }
@@ -763,7 +763,7 @@ public class MaRzAgent extends Agent
 			int prevGoalPoint = 0; // which episode I last reached the goal at
 			for (int i = 0; i < episodicMemory.size(); ++i)
 			{
-				Episode ep = episodicMemory.get(i);
+				Episode ep = (Episode) episodicMemory.get(i);
 				if (ep.sensorValue == GOAL)
 				{
 					csv.append(i - prevGoalPoint + ",");

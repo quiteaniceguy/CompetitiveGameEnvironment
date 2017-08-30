@@ -1,32 +1,42 @@
 import java.util.HashMap;
 import java.util.Map;
 
+
+
 public class CompetitiveGameEnvironment {
 	public static boolean[] X_BOOL_VALUE = {true, false};
 	public static boolean[] O_BOOL_VALUE = {false, true};
 	public static boolean[] NULL_BOOL_VALUE = {true, true};
 	
+	///used to convert char values to 2 boolean values
 	public static int CHAR_TO_BOOL_LENGTH = 2;
 	
 	public static int N_EXTRA_SENSORS = 2;
 	
+	//defines gameBoard dimensions
 	public static int GAMEBOARD_WIDTH = 3;
 	public static int GAMEBOARD_HEIGHT = 3;
 	
+	//start positions for players
 	public static int PLAYER_ONE_START = 2;
 	public static int PLAYER_TWO_START = 6;	
 	
+	//possible moves for agent, not sure what will happen if you change these
 	final int[][] MOVES = { {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 	
+	//holds gameboard data
 	private char[][] gameBoard = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH]; 
 	
 	
 	private int transitions[][];
+	
+	//possible agent moves
 	private char[] alphabet = {'a', 'b', 'c', 'd'};
 	
 	public int playerOneCurrPostition;
 	public int playerTwoCurrPosition;
 	
+	//holds both players positions and players score
 	Map<Character, Integer> playerPos = new HashMap<Character, Integer>();
 	Map<Character, Integer> playerScore = new HashMap<Character, Integer>();
 	

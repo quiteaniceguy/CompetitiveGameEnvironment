@@ -12,20 +12,21 @@ import java.util.Map;
 
 public class RunCompetitiveEnvironment {
 	public static final int N_GAME_ENVIRONMENTS = 1;
-	public static final int N_SUCCESSES = 1000;
+	public static final int N_SUCCESSES = 200;
 	
 	public static CompetitiveGameEnvironment env;
 	
 	public static Agent agentOne;
 	public static Agent agentTwo;
 	
-	public static boolean agentOneDone;
-	public static boolean agentTwoDone; 
+	public static AgentExec agentRunnerOne;
+	public static AgentExec agentRunnerTwo;
 	
 	public static String outputOne = "n: ";
 	public static String outputTwo = "m: ";
 	
 	public static Map<Character, String> outputValues = new HashMap<Character, String>();
+	public static Map<Character, AgentData> agentDatas = new HashMap<Character, AgentData>();
 	
 	public static void main(String args[]){
 		
@@ -64,17 +65,26 @@ public class RunCompetitiveEnvironment {
 	 * Runs the two previously defined agents in the competitive game environment
 	 */
 	public static void exploreEnvironmentWithTwoAgents(){
-		agentOne = new NSMAgent('x');
-		agentTwo = new NSMAgent('o');
+		
+		Agent agentOne = new MaRzAgent('x');
+		Agent agentTwo = new MaRzAgent('o');
+		
 		
 		//nsm.setSensorOutputRandom(nsm.prevStateSensorOutput);
-		RunCompetitiveEnvironment compEnv = new RunCompetitiveEnvironment();
-		 
-			
+		RunCompetitiveEnvironment compEnv = new RunCompetitiveEnvironment();	
 		///MaRz exploreEnvironment also calls NSM exploreEnvironment
 		LockObject lock = compEnv.new LockObject();
-		Thread runnerOne = new Thread(compEnv.new AgentOneRunner(lock));
-		Thread runnerTwo = new Thread(compEnv.new AgentTwoRunner(lock));
+		
+		/*
+		agentRunnerOne = compEnv.new AgentExec(lock, agentOne, agentTwo);
+		agentRunnerTwo = compEnv.new AgentExec(lock, agentTwo, agentOne);
+		*/
+		
+		agentDatas.put('x', compEnv.new AgentData( new NSMAgent('x'), compEnv.new AgentExec(lock, agentOne, agentTwo) ) );
+		agentDatas.put('o', compEnv.new AgentData( new NSMAgent('o'), compEnv.new AgentExec(lock, agentTwo, agentOne) ) );
+		
+		Thread runnerOne = new Thread(agentDatas.get('x').agentRunner);
+		Thread runnerTwo = new Thread(agentDatas.get('o').agentRunner);
 		
 		runnerTwo.start();
 		runnerOne.start();
@@ -93,12 +103,8 @@ public class RunCompetitiveEnvironment {
 	
 	
 
+	/*
 	
-	/**
-	 * Runs agentOne in competitive environment 
-	 * @author tommyeblen
-	 *
-	 */
 	public class AgentOneRunner implements Runnable{
 		LockObject obj;
 		public AgentOneRunner(LockObject obj){
@@ -140,11 +146,7 @@ public class RunCompetitiveEnvironment {
 		}
 		
 	}
-	/**
-	 * Runs agentTwo in competitive environment 
-	 * @author tommyeblen
-	 *
-	 */
+	
 	public class AgentTwoRunner implements Runnable{
 		
 		LockObject obj;
@@ -187,6 +189,84 @@ public class RunCompetitiveEnvironment {
 		}
 		
 	}
+	*/
+	
+	/**
+	 * Executes the agent and alternates between the 'agent' and 'otherAgent' moves,
+	 * using the lockobject to alternate between threads. It is the agents responsibility 
+	 * to switch to the other thread.
+	 * @author tommyeblen
+	 *
+	 */
+	public class AgentExec implements Runnable{
+		
+		LockObject obj;
+		Agent agent;
+		Agent otherAgent;
+		
+		public AgentExec(LockObject obj, Agent agent, Agent otherAgent){
+			this.obj = obj;
+			this.agent = agent;
+			this.otherAgent = otherAgent;
+		}
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			synchronized(obj){
+				
+			
+				while (agent.episodicMemory.size() < agent.MAX_EPISODES && agent.Successes <= agent.NUM_GOALS){
+						//System.out.println(agent.playerChar + " exlporing");
+						agent.exploreEnvironment();
+					
+					
+					
+					///Notifies other agent 
+					
+					
+					//breaks out of loop if agent is completed
+					//if(switchMovingAgent())
+						//break;
+					
+						
+					
+				}//while
+				//System.out.println("agent: " + agent.playerChar + " out");
+				
+			}
+			
+		}
+		
+		/**
+		 * Switches the currentAgent moving
+		 */
+		public void switchMovingAgent(){
+			obj.notifyAll();
+			if(!(agent.episodicMemory.size() < agent.MAX_EPISODES && agent.Successes <= agent.NUM_GOALS)){
+				agent.agentDone = true;
+				//System.out.println("agent: " + agent.playerChar + " done");
+				//return;
+			}
+			//Waits for other agents move completion
+			try {
+				if(!otherAgent.agentDone && !agent.agentDone){
+					//System.out.println(agent.playerChar + " waiting");
+					obj.wait();
+				}
+					
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			
+		}
+		
+		
+		
+	}
 	
 	/**
 	 * Class used for lock and to hold current agents' status
@@ -198,12 +278,20 @@ public class RunCompetitiveEnvironment {
 		boolean agentTwoDone = false;
 	}
 
-	
-	
-	
-	
-
-	
+	/**
+	 * holds both the agent and its runner
+	 * @author tommyeblen
+	 *
+	 */
+	public class AgentData{
+		Agent agent;
+		AgentExec agentRunner;
+		
+		public AgentData(Agent agent, AgentExec agentRunner){
+			this.agent = agent;
+			this.agentRunner = agentRunner;
+		}
+	}
 	
 	/**
 	 * Writes 'output' string to file with 'fileName' in the current directory

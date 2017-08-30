@@ -1,10 +1,16 @@
-import java.io.FileWriter;
-import java.io.IOException;
 import static java.lang.Math.floor;
 import static java.lang.Math.log;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Date;
+import java.util.Random;
+
+
+
+
+
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,8 +21,9 @@ import java.util.Date;
 /**
  *
  * @author Will Goolkasian
+ * @param <AgentRunner>
  */
-public abstract class Agent {
+public abstract class Agent<AgentRunner> {
     //Instance Variables
     protected StateMachineEnvironment env;
     protected char[] alphabet;
@@ -59,6 +66,9 @@ public abstract class Agent {
     public static void debugPrint(String s) { if (debug) System.out.print(s); }
 
     public char playerChar;
+    
+    boolean agentDone = false;
+  
     /**
      * ctor
      *
@@ -394,6 +404,8 @@ public abstract class Agent {
                 debugPrintln("Success after " + (i + 1) + " steps."); 
                 return true;
            }
+            
+           
         }
         // If we make it through the entire loop, the path was unsuccessful
         return false;
@@ -425,7 +437,7 @@ public abstract class Agent {
         for (int i = 0; i < pathToTry.length(); i++) {
         	
             sensors = RunCompetitiveEnvironment.env.tick(playerChar, pathToTry.charAt(i));
-            
+            System.out.println("player " + playerChar + ": " + pathToTry.charAt(i));
             //runs nsm agent tick each time MaRz agent ticks
             //RunCompetitiveEnvironment.agentOneExploreEnvironment();
             
@@ -440,9 +452,11 @@ public abstract class Agent {
                 
                 lastSuccess = episodicMemory.size();
                 
-                
+                RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
                 return pathToTry.substring(0,i+1);
             }
+            
+            RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
         }
         // If we make it through the entire loop, the path was unsuccessful
         return "FAIL";
@@ -701,6 +715,9 @@ public abstract class Agent {
         }
         return nowStr;
     }//makeNowString
+    
+    
+    
 
     
 
