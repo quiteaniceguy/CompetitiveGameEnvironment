@@ -52,7 +52,7 @@ public abstract class Agent<AgentRunner> {
     
     /** Number of episodes per run */
     public static final int MAX_EPISODES = 2000000;
-    public static final int NUM_GOALS = 1000;
+    public static final int NUM_GOALS = 500;
     /** Number of state machines to test a given constant combo with */
     public static final int NUM_MACHINES = 50;
     
@@ -68,6 +68,7 @@ public abstract class Agent<AgentRunner> {
     public char playerChar;
     
     boolean agentDone = false;
+    CompetitiveEnvironmentRunner agentRunner;
   
     /**
      * ctor
@@ -75,15 +76,16 @@ public abstract class Agent<AgentRunner> {
      * creates a new environment for hte agent and then initializes variables
      *
      **/
-    public Agent(char playerChar)
+    public Agent(char playerChar, CompetitiveEnvironmentRunner agentRunner)
     {
         //gets called when child instances are instantiated. could probably copy StateMachineAgent's(as NewAgent and NSMagent call it anyway) but didn't want to yet. so its emppty.
         env = new StateMachineEnvironment();
-        alphabet = RunCompetitiveEnvironment.env.getAlphabet();
+        alphabet = agentRunner.env.getAlphabet();
         episodicMemory = new ArrayList<Episode>();
         memory = "";
         
         this.playerChar = playerChar;
+        this.agentRunner = agentRunner;
     }
     
     /**
@@ -396,7 +398,7 @@ public abstract class Agent<AgentRunner> {
         boolean[] sensors;
         // Enter each character in the path
         for (int i = 0; i < pathToTry.size(); i++) {
-            sensors = RunCompetitiveEnvironment.env.tick(playerChar, pathToTry.get(i));
+            sensors = agentRunner.env.tick(playerChar, pathToTry.get(i));
             int encodedSensorResult = encodeSensors(sensors);
             episodicMemory.add(new Episode(pathToTry.get(i), encodedSensorResult));
             if (sensors[IS_GOAL]){
@@ -436,7 +438,7 @@ public abstract class Agent<AgentRunner> {
         // Enter each character in the path
         for (int i = 0; i < pathToTry.length(); i++) {
         	
-            sensors = RunCompetitiveEnvironment.env.tick(playerChar, pathToTry.charAt(i));
+            sensors = agentRunner.env.tick(playerChar, pathToTry.charAt(i));
             System.out.println("player " + playerChar + ": " + pathToTry.charAt(i));
             //runs nsm agent tick each time MaRz agent ticks
             //RunCompetitiveEnvironment.agentOneExploreEnvironment();
@@ -448,15 +450,15 @@ public abstract class Agent<AgentRunner> {
                 Successes++;
                 debugPrintln("Success after " + (i + 1) + " steps.");
 
-                RunCompetitiveEnvironment.outputValues.put(playerChar, RunCompetitiveEnvironment.outputValues.get(playerChar) + String.valueOf(episodicMemory.size() - lastSuccess) + ",");
+                agentRunner.outputValues.put(playerChar, agentRunner.outputValues.get(playerChar) + String.valueOf(episodicMemory.size() - lastSuccess) + ",");
                 
                 lastSuccess = episodicMemory.size();
                 
-                RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
+                agentRunner.agentDatas.get(playerChar).switchMovingAgent();
                 return pathToTry.substring(0,i+1);
             }
             
-            RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
+            agentRunner.agentDatas.get(playerChar).switchMovingAgent();
         }
         // If we make it through the entire loop, the path was unsuccessful
         return "FAIL";

@@ -187,9 +187,9 @@ public class MaRzAgent extends Agent
 	 * MaRzAgent
 	 * 
 	 */
-	public MaRzAgent(char playerChar)
+	public MaRzAgent(char playerChar, CompetitiveEnvironmentRunner agentRunner)
 	{
-		super(playerChar);
+		super(playerChar, agentRunner);
 		
 		hashFringe = new HashMap<String, MaRzAgent.SuffixNode>();
 
@@ -700,6 +700,8 @@ public class MaRzAgent extends Agent
 	 */
 	public static void tryGenLearningCurves()
 	{
+		//Use runner to run code
+		/*
 		double sumOfAvgSteps = 0.0;
 		double currentBaseline = 0.0;
 
@@ -714,7 +716,7 @@ public class MaRzAgent extends Agent
 
 				System.out.println("Starting on Machine " + i + " of "
 						+ NUM_MACHINES);
-				MaRzAgent gilligan = new MaRzAgent('o');
+				MaRzAgent gilligan = new MaRzAgent('o', new CompetitiveEnvironmentRunner());
 
 				if (Agent.debug)
 					gilligan.env.printStateMachineGraph();
@@ -746,6 +748,8 @@ public class MaRzAgent extends Agent
 					+ "a noob...");
 			System.exit(-1);
 		}// catch
+		
+		*/
 
 	}// tryGenLearningCurves
 

@@ -142,8 +142,8 @@ public class NSMAgent extends Agent {
     /**
 	 * The constructor for the agent simply initializes it's instance variables
 	 */
-	public NSMAgent(char playerChar) {
-		super(playerChar);
+	public NSMAgent(char playerChar, CompetitiveEnvironmentRunner agentRunner) {
+		super(playerChar, agentRunner);
 		
         informationColumns = 2;
         
@@ -348,9 +348,9 @@ public class NSMAgent extends Agent {
         /////
         
         //boolean[] sensors = env.tick(cmd);
-        boolean[] sensors = RunCompetitiveEnvironment.env.tick(playerChar, cmd);
+        boolean[] sensors = agentRunner.env.tick(playerChar, cmd);
         
-        System.out.println("player " + playerChar + ": " + cmd);
+        //System.out.println("player " + playerChar + ": " + cmd);
        
         //Setup for next iteration
         
@@ -362,7 +362,7 @@ public class NSMAgent extends Agent {
        
         
         if (sensors[IS_GOAL]){
-
+        	System.out.println("Successes: " + Successes);
             nowEp.reward = REWARD_SUCCESS;
             Successes++;
             if (randChance > MIN_RAND_CHANCE)
@@ -372,7 +372,7 @@ public class NSMAgent extends Agent {
 
             //Inform the user of steps that were required
              
-            RunCompetitiveEnvironment.outputValues.put(playerChar, RunCompetitiveEnvironment.outputValues.get(playerChar) + String.valueOf(episodicMemory.size() - lastSuccess) + ",");
+            agentRunner.outputValues.put(playerChar, agentRunner.outputValues.get(playerChar) + String.valueOf(episodicMemory.size() - lastSuccess) + ",");
             //System.out.print("n: " + String.valueOf(episodicMemory.size() - lastSuccess));
             //System.out.print(",");
             lastSuccess = episodicMemory.size();
@@ -381,7 +381,7 @@ public class NSMAgent extends Agent {
         {
             nowEp.reward = REWARD_FAILURE;
         }
-        RunCompetitiveEnvironment.agentDatas.get(playerChar).agentRunner.switchMovingAgent();
+        agentRunner.agentDatas.get(playerChar).switchMovingAgent();
         //while
     }//exploreEnvironment
     
@@ -422,7 +422,8 @@ public class NSMAgent extends Agent {
      *
 	 */
 	public static void main(String [ ] args) {
-        
+		//Use runner to run code
+        /*
             try{
                 String fname = "AIReport_" + makeNowString() + ".csv";
                 FileWriter csv = new FileWriter(fname);
@@ -464,7 +465,7 @@ public class NSMAgent extends Agent {
                 int blindLengthSum = 0;
                 
                 for(int i = 0; i < NUM_MACHINES; ++i) {
-                    NSMAgent skipper = new NSMAgent('x');
+                    NSMAgent skipper = new NSMAgent('x', new CompetitiveEnvironmentRunner());
 
                     //Print blind path length 
                     String sbPath = skipper.env.shortestPathToGoal();
@@ -497,7 +498,7 @@ public class NSMAgent extends Agent {
             catch(IOException e){
                 
             }
-            
+         */
 	}
 
 }//class NSMAgent

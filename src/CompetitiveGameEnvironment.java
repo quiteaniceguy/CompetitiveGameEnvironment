@@ -1,25 +1,26 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 
 public class CompetitiveGameEnvironment {
-	public static boolean[] X_BOOL_VALUE = {true, false};
-	public static boolean[] O_BOOL_VALUE = {false, true};
-	public static boolean[] NULL_BOOL_VALUE = {true, true};
+	public boolean[] X_BOOL_VALUE = {true, false};
+	public boolean[] O_BOOL_VALUE = {false, true};
+	public boolean[] NULL_BOOL_VALUE = {true, true};
 	
 	///used to convert char values to 2 boolean values
-	public static int CHAR_TO_BOOL_LENGTH = 2;
+	public int CHAR_TO_BOOL_LENGTH = 2;
 	
-	public static int N_EXTRA_SENSORS = 2;
+	public int N_EXTRA_SENSORS = 2;
 	
 	//defines gameBoard dimensions
-	public static int GAMEBOARD_WIDTH = 3;
-	public static int GAMEBOARD_HEIGHT = 3;
+	public int GAMEBOARD_WIDTH = 3;
+	public int GAMEBOARD_HEIGHT = 3;
 	
 	//start positions for players
-	public static int PLAYER_ONE_START = 2;
-	public static int PLAYER_TWO_START = 6;	
+	public int PLAYER_ONE_START = 2;
+	public int PLAYER_TWO_START = 6;	
 	
 	//possible moves for agent, not sure what will happen if you change these
 	final int[][] MOVES = { {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -47,12 +48,13 @@ public class CompetitiveGameEnvironment {
 		transitions = new int[GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT][MOVES.length];
 		setTranstions(transitions);
 		
+		Random rand = new Random();
 		
 		//initialize player position and score
-		playerPos.put('x', PLAYER_ONE_START);
+		playerPos.put('x', rand.nextInt(transitions.length));
 		setGameboardSquare('x', PLAYER_ONE_START);
 		
-		playerPos.put('o', PLAYER_TWO_START);
+		playerPos.put('o', rand.nextInt(transitions.length));
 		setGameboardSquare('o', PLAYER_TWO_START);
 		
 		playerScore.put('x', 0);
@@ -163,7 +165,7 @@ public class CompetitiveGameEnvironment {
 	 * @param cToCheck
 	 * @return
 	 */
-	private char[][] checkForVictory(char[][] board, char cToCheck){
+	private char[][] checkForVictory(char[][] board, char[] cToCheck){
 		char[][] returnValue = checkForDiagVictory(board, cToCheck);
 		if(!boardIsEmpty(returnValue)) return returnValue;
 		
@@ -179,16 +181,28 @@ public class CompetitiveGameEnvironment {
 	 * @param cToCheck
 	 * @return
 	 */
-	private char[][] checkForVertVictory(char[][] board, char cToCheck){
+	private char[][] checkForVertVictory(char[][] board, char[] cToCheck){
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
+		
+		boolean breakLoopThrough = true;
+		
 		for ( int i = 0; i < board[0].length; i++) {
 			
 			setBoardToEmpty(returnValue);
 			
+			loopThroughVert:
 			for ( int j = 0; j < board.length; j++) {
 				
-				if ( !(board[j][i] == cToCheck) )
-					break;
+				breakLoopThrough = true;
+					
+				for( char c: cToCheck)
+					if( (board[j][i] == c) )
+						breakLoopThrough = false;
+				
+				if (breakLoopThrough) break loopThroughVert;
+				
+				
+				
 				returnValue[j][i] = 's';
 				if ( j == board.length - 1)
 					return returnValue;
@@ -206,15 +220,26 @@ public class CompetitiveGameEnvironment {
 	 * @param cToCheck
 	 * @return
 	 */
-	private char[][] checkForHorzVictory(char[][] board, char cToCheck){
+	private char[][] checkForHorzVictory(char[][] board, char[] cToCheck){
 		
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
 		
+		boolean breakLoopThrough = true;
+		
 		for ( int i = 0; i < board.length; i++) {
 			setBoardToEmpty(returnValue);
+			
+			loopThroughHorz:
 			for ( int j = 0; j < board[0].length; j++) {
-				if ( !(board[i][j] == cToCheck) )
-					break;
+				
+				breakLoopThrough = true;
+			
+				for( char c: cToCheck)
+					if( (board[i][j] == c) )
+						breakLoopThrough = false;
+				
+				if (breakLoopThrough) break loopThroughHorz;
+				
 				returnValue[i][j] = 's';
 				if ( j == board[0].length - 1)
 					return returnValue;
@@ -231,11 +256,25 @@ public class CompetitiveGameEnvironment {
 	 * @param cToCheck
 	 * @return
 	 */
-	private char[][] checkForDiagVictory(char[][] board, char cToCheck){
+	private char[][] checkForDiagVictory(char[][] board, char[] cToCheck){
 		char[][] returnValue = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH];
+		
+		boolean breakLoopThrough = true;
+		
+		loopThroughBoard:
 		for ( int i = 0; i < board.length && i < board[0].length; i++){
-			if( !(board[i][i] == cToCheck) )
-				break;
+			
+			
+				breakLoopThrough = true;
+			
+				for( char c: cToCheck)
+					if( (board[i][i] == c) )
+						breakLoopThrough = false;
+				
+				if (breakLoopThrough) break loopThroughBoard;
+					
+						
+			
 			returnValue[i][i] = 's';
 			if ( i == board[0].length - 1 || i == board.length - 1)
 				return returnValue;
@@ -315,8 +354,12 @@ public class CompetitiveGameEnvironment {
 		}
 		
 		//checks for victories, clears board of victory positions, and updates score
-		char[][] posToEmpty = checkForVictory(gameBoard, playerChar);
+		char[] charsToCheck = {playerChar};
+		char[][] posToEmpty = checkForVictory(gameBoard, charsToCheck);
 		boolean scored = !boardIsEmpty(posToEmpty);
+		
+		
+			//printGameBoard(gameBoard);
 		
 		setBoardPosToEmpty(gameBoard, posToEmpty);
 		if (scored) {
@@ -360,7 +403,7 @@ public class CompetitiveGameEnvironment {
 		
 		
 		//printSensors(returnSensors);
-		//printGameBoard(gameBoard);
+		
 		return returnSensors;
 	}
 	
