@@ -18,16 +18,25 @@ public class CompetitiveGameEnvironment {
 	public int GAMEBOARD_WIDTH = 3;
 	public int GAMEBOARD_HEIGHT = 3;
 	
+	public int[][] GAMEBOARD_LAYOUT = { {1,1,1},
+										{1,1,1},
+										{1,1,1}
+	};
+	
+
+	
 	//start positions for players
 	public int PLAYER_ONE_START = 2;
 	public int PLAYER_TWO_START = 6;	
 	
-	//possible moves for agent, not sure what will happen if you change these
-	final int[][] MOVES = { {-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+	//possible moves for agent, keep these as one for now; otherwise, loopAround function will be wack
+	final int[][] MOVES = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 	
 	//holds gameboard data
 	private char[][] gameBoard = new char[GAMEBOARD_HEIGHT][GAMEBOARD_WIDTH]; 
 	
+	///output options
+	public final boolean DISPLAY_BOARD_MOVES = false;
 	
 	private int transitions[][];
 	
@@ -45,18 +54,32 @@ public class CompetitiveGameEnvironment {
 	 * Initializes CompetitiveGameEnvironment for players 'x' and 'o'
 	 */
 	public CompetitiveGameEnvironment(){
-		transitions = new int[GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT][MOVES.length];
+		transitions = new int[GAMEBOARD_LAYOUT.length * GAMEBOARD_LAYOUT[0].length][MOVES.length];
 		setTranstions(transitions);
+		
+		printTransitions(transitions);
+		
 		
 		Random rand = new Random();
 		
 		//initialize player position and score
-		playerPos.put('x', rand.nextInt(transitions.length));
-		setGameboardSquare('x', PLAYER_ONE_START);
 		
-		playerPos.put('o', rand.nextInt(transitions.length));
-		setGameboardSquare('o', PLAYER_TWO_START);
+		int startPosOne;
+		int startPosTwo;
 		
+		//set x
+		while(transitions[(startPosOne = rand.nextInt(transitions.length))][0] == -1)
+			continue;
+		playerPos.put('x', startPosOne);
+		setGameboardSquare('x', startPosOne);
+		
+		//set o
+		while(transitions[(startPosTwo = rand.nextInt(transitions.length))][0] == -1 || startPosTwo == startPosOne)
+			continue;
+		playerPos.put('o', startPosTwo);
+		setGameboardSquare('o', startPosTwo);
+		
+		//set both player scores
 		playerScore.put('x', 0);
 		playerScore.put('o', 0);
 		
@@ -85,26 +108,62 @@ public class CompetitiveGameEnvironment {
 	 * 		int array to hold transition values
 	 */
 	private void setTranstions(int transitions[][]){
-		for (int i = 0; i < transitions.length; i++){
-			for(int j = 0; j < MOVES.length; j++)
-				transitions[i][j] = loopAround(i % GAMEBOARD_WIDTH, MOVES[j][0], GAMEBOARD_WIDTH) + loopAround((int)i/GAMEBOARD_WIDTH * GAMEBOARD_WIDTH, MOVES[j][1] * GAMEBOARD_WIDTH, transitions.length);				
+		int i = 0;
+		
+		int gameBoardWidth = GAMEBOARD_LAYOUT[0].length;
+		while (i < transitions.length){
 			
-		}//for
+			
+				
+			for(int j = 0; j < MOVES.length; j++){
+				
+				if(GAMEBOARD_LAYOUT[(int)i / gameBoardWidth][i % gameBoardWidth] == 1){
+					int[] transform = {MOVES[j][0], MOVES[j][1]};
+					System.out.println("transform " + j+ ": " + transform[0] + ", " + transform[1]);
+					int x;
+					int y;
+					
+				
+					///if the board position doesn't exist, continue in the direction of the current move/vector
+					while( GAMEBOARD_LAYOUT
+							[y =  loopAround(((int)i/GAMEBOARD_WIDTH) * GAMEBOARD_WIDTH, transform[1] * GAMEBOARD_WIDTH, transitions.length)/GAMEBOARD_WIDTH]
+							[x =  loopAround(i % GAMEBOARD_WIDTH, transform[0], GAMEBOARD_WIDTH) ]
+							!= 1)
+					{
+						transform[0] += MOVES[j][0];
+						transform[1] += MOVES[j][1];
+					}
+					
+			
+					//System.out.println("transitions " + i + "     move " + j + " to " + String.valueOf(x+y) + "     x value " + x + " y value " + y + "    loop around input" + (i % GAMEBOARD_WIDTH)+ "  " + transform[0] + "   " + gameBoardWidth );
+					transitions[i][j] = x + y * GAMEBOARD_WIDTH;
+				
+				}else{
+					transitions[i][j] = -1;
+				}
+				
+			}
+			i++;
+			
+		}//fortransitions[i][j]
 		
 	}
 	
 	/**
 	 * Used to calculate the possible transitions for a position, including tesseract like moves.
-	 * @param xPos
+	 * @param pos
 	 * @param transform
 	 * @param width
 	 * @return
 	 */
-	private int loopAround(int xPos, int transform, int width){
-		if (xPos + transform < 0)
-			return width + (transform % width);
+	private int loopAround(int pos, int transform, int width){
 		
-		return (xPos +  transform) % width;
+		if (pos + transform < 0){
+			//System.out.println("is negative");
+			return (width - (Math.abs(pos + transform) % width)) % width;
+		}
+		//System.out.println("is positive");
+		return (pos +  transform) % width;
 		
 	}
 	
@@ -137,6 +196,21 @@ public class CompetitiveGameEnvironment {
 			System.out.println("");
 		}
 		System.out.println();
+	}
+	
+	/**
+	 * Gets the number of 1's in int array
+	 * @param gameBoard
+	 * @return
+	 */
+	private int getNStates(int[][] gameBoard){
+		int nStates = 0;
+		for(int i[]: gameBoard)
+			for(int j: i)
+				if (j == 1) nStates++;
+			
+		return nStates;
+		
 	}
 	
 	
@@ -339,6 +413,10 @@ public class CompetitiveGameEnvironment {
 	 * @return
 	 */
 	public boolean[] tick(char playerChar, char playerMove) {
+		if(DISPLAY_BOARD_MOVES){
+			System.out.println("////////////////////////\nPLAYER: " + playerChar);
+			printGameBoard(gameBoard);
+		}
 		boolean[] returnSensors = new boolean[N_EXTRA_SENSORS + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT * CHAR_TO_BOOL_LENGTH + MOVES.length];
 		
 		///agent made mark
@@ -354,12 +432,17 @@ public class CompetitiveGameEnvironment {
 		}
 		
 		//checks for victories, clears board of victory positions, and updates score
-		char[] charsToCheck = {playerChar};
+		char[] charsToCheck = {'x', 'o'};
 		char[][] posToEmpty = checkForVictory(gameBoard, charsToCheck);
 		boolean scored = !boardIsEmpty(posToEmpty);
 		
-		
-			//printGameBoard(gameBoard);
+		if(scored){
+			/*
+			System.out.println("Scored:  ");
+			printGameBoard(posToEmpty);
+			*/
+		}
+			
 		
 		setBoardPosToEmpty(gameBoard, posToEmpty);
 		if (scored) {
@@ -403,6 +486,8 @@ public class CompetitiveGameEnvironment {
 		
 		
 		//printSensors(returnSensors);
+		if(DISPLAY_BOARD_MOVES)
+			printGameBoard(gameBoard);
 		
 		return returnSensors;
 	}

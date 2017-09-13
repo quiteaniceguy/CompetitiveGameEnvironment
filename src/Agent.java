@@ -52,7 +52,7 @@ public abstract class Agent<AgentRunner> {
     
     /** Number of episodes per run */
     public static final int MAX_EPISODES = 2000000;
-    public static final int NUM_GOALS = 500;
+    public static final int NUM_GOALS = 1000;
     /** Number of state machines to test a given constant combo with */
     public static final int NUM_MACHINES = 50;
     

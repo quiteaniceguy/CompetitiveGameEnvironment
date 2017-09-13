@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 public class CompetitiveEnvironmentRunner {
-	public static final int N_GAME_ENVIRONMENTS = 4;
+	public static final int N_GAME_ENVIRONMENTS = 40;
 	
 	public CompetitiveGameEnvironment env;
 	
@@ -23,15 +23,15 @@ public class CompetitiveEnvironmentRunner {
 	
 	
 	///is added to the front of the outputed file names
-	public String addToFileTitle = "AAATESTING";
+	public String addToFileTitle = "NSM_NSM";
 	
 	public static Map<Character, String> fileNames = new HashMap<Character, String>();
 	
-	public CompetitiveEnvironmentRunner(CompetitiveGameEnvironment env){
+	public CompetitiveEnvironmentRunner(CompetitiveGameEnvironment env, String currentDate){
 		
 		//initializes both files names
-		fileNames.put('x', addToFileTitle + "_AgentOne_" + getCurrentDate());
-		fileNames.put('o', addToFileTitle + "_AgentTwo_" + getCurrentDate());
+		fileNames.put('x', addToFileTitle + "_AgentOne_" + currentDate + ".csv");
+		fileNames.put('o', addToFileTitle + "_AgentTwo_" + currentDate + ".csv");
 		
 		this.env = env;
 	}
@@ -44,7 +44,7 @@ public class CompetitiveEnvironmentRunner {
 		//nsm.setSensorOutputRandom(nsm.prevStateSensorOutput)
 		
 		Agent agentOne = new NSMAgent('x', this);
-		Agent agentTwo = new MaRzAgent('o', this);
+		Agent agentTwo = new NSMAgent('o', this);
 		
 		///MaRz exploreEnvironment also calls NSM exploreEnvironment
 		LockObject lock = new LockObject();
@@ -174,25 +174,22 @@ public class CompetitiveEnvironmentRunner {
 	}
 	
 	
-	/**
-	 * Returns current date and time in 'yyyy_MM_dd_HH_mm_ss' format
-	 * @return
-	 */
-	public String getCurrentDate(){
+
+	
+	public static void main(String args[]){
+		
+		///gets the current date
 		DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 		Date date = new Date();
 		
-		return dateFormat.format(date);
-	}
-	
-	public static void main(String args[]){
+		String currentDate = dateFormat.format(date);
 		
 		CompetitiveEnvironmentRunner runner;
 		///initialize output values for x and o
 		
 		for ( int i = 0; i < N_GAME_ENVIRONMENTS; i++){
 			///create game runner
-			runner = new CompetitiveEnvironmentRunner(new CompetitiveGameEnvironment());
+			runner = new CompetitiveEnvironmentRunner(new CompetitiveGameEnvironment(), currentDate);
 			
 			System.out.println();
 			System.out.println("Starting environment number: " +  String.valueOf(i + 1) );
