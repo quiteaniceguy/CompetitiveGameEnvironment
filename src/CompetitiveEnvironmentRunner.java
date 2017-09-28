@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 public class CompetitiveEnvironmentRunner {
-	public static final int N_GAME_ENVIRONMENTS = 40;
+	public static final int N_GAME_ENVIRONMENTS = 30;
 	
 	public CompetitiveGameEnvironment env;
 	
@@ -23,7 +23,7 @@ public class CompetitiveEnvironmentRunner {
 	
 	
 	///is added to the front of the outputed file names
-	public String addToFileTitle = "NSM_NSM";
+	public String addToFileTitle = "NSM_NSM_ALLCHAR3INROW_12KNEAREST";
 	
 	public static Map<Character, String> fileNames = new HashMap<Character, String>();
 	
@@ -184,8 +184,8 @@ public class CompetitiveEnvironmentRunner {
 		
 		String currentDate = dateFormat.format(date);
 		
+		
 		CompetitiveEnvironmentRunner runner;
-		///initialize output values for x and o
 		
 		for ( int i = 0; i < N_GAME_ENVIRONMENTS; i++){
 			///create game runner
@@ -211,6 +211,7 @@ public class CompetitiveEnvironmentRunner {
 			
 			
 		}
+		
 		System.out.println("GAME ENDED");
 	}
 	

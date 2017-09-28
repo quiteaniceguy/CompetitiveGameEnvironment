@@ -81,7 +81,7 @@ public class NSMAgent extends Agent {
      * taken next.
      */
     public static class NHood {
-        public final int K_NEAREST = 8;  //max allowed size of neighborhood
+        public final int K_NEAREST = 12;  //max allowed size of neighborhood
         
         public char command;           // action associated with this neighborhood
         public ArrayList<NBor> nbors;  // neigbhors in the hood
