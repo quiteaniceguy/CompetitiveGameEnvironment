@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 public class CompetitiveEnvironmentRunner {
-	public static final int N_GAME_ENVIRONMENTS = 30;
+	public static final int N_GAME_ENVIRONMENTS = 5;
 	
 	public CompetitiveGameEnvironment env;
 	
@@ -23,15 +23,15 @@ public class CompetitiveEnvironmentRunner {
 	
 	
 	///is added to the front of the outputed file names
-	public String addToFileTitle = "NSM_NSM_ALLCHAR3INROW_12KNEAREST";
+	public String addToFileTitle = "ONE_RANDOM_BLOCKED_ChanceChanges.05_10000MOVES_MaRz";
 	
 	public static Map<Character, String> fileNames = new HashMap<Character, String>();
 	
 	public CompetitiveEnvironmentRunner(CompetitiveGameEnvironment env, String currentDate){
 		
 		//initializes both files names
-		fileNames.put('x', addToFileTitle + "_AgentOne_" + currentDate + ".csv");
-		fileNames.put('o', addToFileTitle + "_AgentTwo_" + currentDate + ".csv");
+		fileNames.put('x', "testoutput/" + addToFileTitle + "_AgentOne_" + currentDate + ".csv");
+		fileNames.put('o', "testoutput/" + addToFileTitle + "_AgentTwo_" + currentDate + ".csv");
 		
 		this.env = env;
 	}
@@ -43,8 +43,8 @@ public class CompetitiveEnvironmentRunner {
 		
 		//nsm.setSensorOutputRandom(nsm.prevStateSensorOutput)
 		
-		Agent agentOne = new NSMAgent('x', this);
-		Agent agentTwo = new NSMAgent('o', this);
+		Agent agentOne = new MaRzAgent('x', this);
+		Agent agentTwo = new MaRzAgent('o', this);
 		
 		///MaRz exploreEnvironment also calls NSM exploreEnvironment
 		LockObject lock = new LockObject();

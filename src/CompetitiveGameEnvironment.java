@@ -23,6 +23,10 @@ public class CompetitiveGameEnvironment {
 										{1,1,1}
 	};
 	
+	///squares that will be blocked to agents
+	public int N_BLOCKED_SQUARES = 1;
+	public double BLOCKED_CHANGE_CHANCE = .05;
+	
 
 	
 	//start positions for players
@@ -50,13 +54,16 @@ public class CompetitiveGameEnvironment {
 	Map<Character, Integer> playerPos = new HashMap<Character, Integer>();
 	Map<Character, Integer> playerScore = new HashMap<Character, Integer>();
 	
+	//
+	public int[] squaresToBlock = {4};
+	
+	Random random = new Random();
 	/**
 	 * Initializes CompetitiveGameEnvironment for players 'x' and 'o'
 	 */
 	public CompetitiveGameEnvironment(){
 		transitions = new int[GAMEBOARD_LAYOUT.length * GAMEBOARD_LAYOUT[0].length][MOVES.length];
 		setTranstions(transitions);
-		
 		printTransitions(transitions);
 		
 		
@@ -229,6 +236,12 @@ public class CompetitiveGameEnvironment {
 		}
 		gameBoard[(int)intPosition/GAMEBOARD_WIDTH][intPosition % GAMEBOARD_WIDTH] = c;
 		return true;
+	}
+	
+	private void setRandomBoardBlocks(int[] blocks, char[][] board, int nBlocks){
+		for (int i = 0; i < nBlocks; i++ ) {
+			blocks[i] = (int)(Math.random() * (board.length * board[0].length));
+		}
 	}
 	
 	/**
@@ -417,7 +430,7 @@ public class CompetitiveGameEnvironment {
 			System.out.println("////////////////////////\nPLAYER: " + playerChar);
 			printGameBoard(gameBoard);
 		}
-		boolean[] returnSensors = new boolean[N_EXTRA_SENSORS + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT * CHAR_TO_BOOL_LENGTH + MOVES.length];
+		boolean[] returnSensors = new boolean[N_EXTRA_SENSORS + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT * CHAR_TO_BOOL_LENGTH + MOVES.length + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT];
 		
 		///agent made mark
 		returnSensors[0] = true;
@@ -425,14 +438,24 @@ public class CompetitiveGameEnvironment {
 		///agent got 3 in a row
 		returnSensors[1] = false;
 		
+		//check to see if agent moving into blocked square.
+		boolean blockMove = false;
+		for(int i: squaresToBlock){
+			if (i == transitions[playerPos.get(playerChar)][findAlphabetIndex(playerMove)]){
+				blockMove = true;
+			}
+		}
+		
 		//try to make new mark
-		playerPos.put(playerChar, transitions[playerPos.get(playerChar)][findAlphabetIndex(playerMove)]);
-		if(!setGameboardSquare(playerChar, playerPos.get(playerChar))){
-			returnSensors[0] = false;
+		if(!blockMove){
+			playerPos.put(playerChar, transitions[playerPos.get(playerChar)][findAlphabetIndex(playerMove)]);
+			if(!setGameboardSquare(playerChar, playerPos.get(playerChar))){
+				returnSensors[0] = false;
+			}
 		}
 		
 		//checks for victories, clears board of victory positions, and updates score
-		char[] charsToCheck = {'x', 'o'};
+		char[] charsToCheck = {playerChar};
 		char[][] posToEmpty = checkForVictory(gameBoard, charsToCheck);
 		boolean scored = !boardIsEmpty(posToEmpty);
 		
@@ -473,6 +496,11 @@ public class CompetitiveGameEnvironment {
 			
 		}
 		
+		//put sensors for blocks in
+		for (int i: squaresToBlock){
+			returnSensors[N_EXTRA_SENSORS + GAMEBOARD_WIDTH * GAMEBOARD_HEIGHT * CHAR_TO_BOOL_LENGTH + MOVES.length + i] = true;
+		}
+		
 		//
 		char oppositeChar = playerChar == 'x' ? 'o': 'x'; 
 		for( int i = 0; i < alphabet.length; i++){
@@ -483,11 +511,19 @@ public class CompetitiveGameEnvironment {
 			
 		}
 		
+		//check to see if square blocks should be changes
+		if (random.nextDouble() < BLOCKED_CHANGE_CHANCE) {
+			setRandomBoardBlocks(squaresToBlock, gameBoard, N_BLOCKED_SQUARES);
+			System.out.println("blocked square = " + squaresToBlock[0]);
+		}
 		
 		
 		//printSensors(returnSensors);
-		if(DISPLAY_BOARD_MOVES)
+		if(DISPLAY_BOARD_MOVES){
 			printGameBoard(gameBoard);
+			System.out.println("Player Pos: " + playerPos.get(playerChar));
+		}
+			
 		
 		return returnSensors;
 	}
